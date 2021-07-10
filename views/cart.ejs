@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="cart.css">
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <h1>Cart</h1>
+        <h2>Total Items in Cart:<span id="cartVal"></span></h2>
+        <div class="parent">
+            <p>Parent Div</p>
+            <div id="child"></div>
+
+        </div>
+
+        <h1>Total Value: <span id="totalAmt"></span></h1>
+
+        <button><a href="/checkout">Proceed to Checkout</a></button>
+        
+        <script>
+
+            let cartVal = document.getElementById("cartVal")
+            let totalAmt = document.getElementById("totalAmt")
+            let productDiv = document.getElementById("child")
+            
+
+            productDiv.innerText = " "
+
+            function loadCartObjToPage()
+            {
+                let products = window.localStorage.getItem('products')
+                products = JSON.parse(products)
+                //console.log(products)
+                
+                products.forEach((element,index) => {
+
+                    //console.log(element)
+                    
+                    //console.log()
+
+                    productDiv.innerHTML += `
+                    <div class="product">
+                    <h2>${element.name}</h2>
+                    <h3>${element.price}</h3>
+                    <label for="cars">Qty:</label>
+                    <select class="list" name="quantity">
+                        <option value="1" class="option">1</option>
+                        <option value="2" class="option">2</option>
+                        <option value="3" class="option">3</option>
+                        <option value="4" class="option">4</option>
+                    </select>
+                    </div>
+                    `
+                });
+
+                let list = document.querySelectorAll(".list")
+                console.log(list[0].options[2].setAttribute("selected","selected"))
+                    
+               
+
+                    for( let i = 0 ; i < list.length ; i++)
+                    {
+                        // let refIndex = products[i].inCart
+                        // options[refIndex].setAttribute("selected","selected")
+                        //console.log(products[i].inCart)
+                        let inCartVal = parseInt(products[i].inCart)
+                        console.log(typeof(inCartVal))
+                        list[i].options[inCartVal-1].setAttribute("selected","selected")
+                        
+                        
+                    }
+
+                    onLoadCartValue()
+                
+            }
+
+            loadCartObjToPage()
+
+
+            function calculateTotal()
+            {
+                
+                let products = window.localStorage.getItem('products')
+                products = JSON.parse(products)
+                let total = 0
+                products.forEach((element,index)=>{
+                    total += (element.inCart)*(element.price)
+                })
+
+                totalAmt.innerHTML = total;
+            }
+
+            calculateTotal()
+
+
+            function onListChange()
+            {
+                let listItems = document.querySelectorAll(".list")
+                //console.log(listItems)
+
+                for( let i = 0 ; i < listItems.length ; i++)
+                {
+                    listItems[i].onchange = ()=>
+                    {
+                        changeLocalStorageValue(listItems[i].value,i)
+                    }
+                }
+            }
+
+            onListChange()
+
+            function changeLocalStorageValue(value,index)
+            {
+                let cartItems = window.localStorage.getItem('products')
+                cartItems = JSON.parse(cartItems)
+
+                cartItems[index].inCart = value
+
+                window.localStorage.setItem("products",JSON.stringify(cartItems))
+                calculateTotal()
+                onLoadCartValue()
+            }
+
+
+            
+
+
+
+            function onLoadCartValue(){
+
+                let products = window.localStorage.getItem('products')
+                products = JSON.parse(products)
+                let updateCartVal = 0 
+
+                products.forEach((element,index)=>{
+                    
+                    //console.log(element.inCart)
+                    updateCartVal += parseInt(element.inCart)
+                })
+                //let productNum = localStorage.getItem('cartValue')
+
+                if(updateCartVal)
+                {
+                    cartVal.innerText = updateCartVal
+                }
+                else
+                {
+                    cartVal.innerText = 0
+                }
+            }
+
+            onLoadCartValue();
+
+        </script>
+    </body>
+</html>

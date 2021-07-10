@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <h1>Confirm Address</h1>
+        <button id="rzp-button1">Proceed to Payment</button>
+        
+        <script>
+
+            function onPageLoadGenOrder()
+            {
+                var url = "https://polar-thicket-56860.herokuapp.com/orders/initiate"
+                let paramsPay = {
+                "id":"60bb4483f38adc0015c29c36",
+                "totalamt":parseInt(window.localStorage.getItem('totalamt'))*100,
+                "order":{
+                    "products":[{
+                        "productName":"Blue T LGS",
+                        "quantity":5,
+                        "price":120
+                        },{
+                        "productName":"Blue T ORG",
+                        "quantity":4,
+                        "price":100
+                    }]
+                }   
+            }
+
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange = function(res){
+                    
+                    if(xmlhttp.readyState === 4)
+                    {
+                        res = JSON.parse(xmlhttp.responseText);
+                        console.log(res.sub.id)
+                        saveOrderIDtoLocalStorage(res.sub.id)
+
+                    }
+                    
+                }
+
+                xmlhttp.open("POST",url,true) //true means request sent is asynchronous i.e. we are waiting for the response
+                xmlhttp.setRequestHeader("Content-type", "application/json");
+                xmlhttp.send(JSON.stringify(paramsPay));
+            }
+
+            onPageLoadGenOrder()
+
+
+            function saveOrderIDtoLocalStorage(orderID)
+            {
+                window.localStorage.setItem('orderID',orderID)
+            }
+
+
+            function calculateTotal()
+            {
+                
+                let products = window.localStorage.getItem('products')
+                products = JSON.parse(products)
+                let total = 0
+                products.forEach((element,index)=>{
+                    total += (element.inCart)*(element.price)
+                })
+
+                //totalAmt.innerHTML = total;
+                window.localStorage.setItem('totalamt',total)
+            }
+
+            calculateTotal()
+
+        </script>
+
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <script>
+
+            document.getElementById("rzp-button1").onclick = function(e)
+            {
+                var options = 
+                {
+                    "key": "rzp_test_8lr6qVelAwkrFc",
+                    "currency": "INR",
+                    "name":"Tribal Basket",
+                    "description": "TB Blue Tea",
+                    "order_id": window.localStorage.getItem('orderID'),
+                    "handler": function(response)
+                    {
+                        document.getElementById("order-pay-id").value = response.razorpay_payment_id;
+                        document.getElementById("order-id").value = response.razorpay_order_id;
+                        document.getElementById("order-sig").value = response.razorpay_signature;
+
+                    },
+                    "theme": 
+                    {
+                        "color": "#0EB9F2"
+                    }
+                }
+
+                var rzp1 = new Razorpay(options)
+                rzp1.open()
+                e.preventDefault()
+            }
+        </script>
+    </body>
+</html>

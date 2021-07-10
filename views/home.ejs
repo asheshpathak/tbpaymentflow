@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="home.css">
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <h1>Homepage</h1>
+        <h2>Total Items in <a href="/cart">Cart:</a><span id="cartVal"></span></h2>
+        <div class="parent">
+            <div class="child">
+                <h1>Blue Tea original</h1>
+                <h2>INR 100</h2>
+                <button class="addToCart">Add to cart</button>
+                <p>I'm a para</p>
+            </div>
+            <div class="child">
+                <h1>Blue tea Lemongrass</h1>
+                <h2>INR 110</h2>
+                <p>I'm a para</p>
+                <button class="addToCart">Add to cart</button>
+            </div>
+        </div>
+
+        
+        <script>
+
+            let cartVal = document.getElementById("cartVal")
+            let cart = document.querySelectorAll(".addToCart")
+
+            let products = [{
+                    "name": "Blue Tea Org",
+                    "tag" : "btorg",
+                    "price" : 100,
+                    "inCart" : 0
+                },{
+                    "name": "Blue Tea Lgs",
+                    "tag" : "btlgs",
+                    "price" : 110,
+                    "inCart" : 0
+                }
+            ]
+
+
+
+            for(let i = 0; i < cart.length ; i++)
+            {
+                // console.log(i)
+                cart[i].addEventListener('click',()=>{  
+                    incrementCartValue(products[i],i)
+                    
+                })
+            }
+
+
+            function incrementCartValue(product,index)
+            {
+                let productNum = localStorage.getItem('cartValue')
+                productNum = parseInt(productNum)
+                //console.log(product)
+
+                if(productNum)
+                {
+                    productNum += 1
+                    window.localStorage.setItem('cartValue',productNum)
+                    cartVal.textContent = productNum
+                }
+                else
+                {
+                    window.localStorage.setItem('cartValue',1)
+                    cartVal.textContent = 1
+                }
+
+                setItem(product,index)
+                
+            }
+
+            function setItem(product,index)
+            {
+                //console.log(product)
+                //window.localStorage.setItem("product1",JSON.stringify(product))
+                //console.log(product.inCart)
+                // let products = [{},{}]
+                fetchProducts = window.localStorage.getItem("products")
+                fetchProducts = JSON.parse(fetchProducts)
+
+                if(fetchProducts)
+                {
+                    if(fetchProducts[index].inCart)
+                    {
+                        fetchProducts[index].inCart += 1
+                        window.localStorage.setItem("products",JSON.stringify(fetchProducts))
+                    }
+                    else
+                    {
+                        fetchProducts[index].inCart = 1
+                        window.localStorage.setItem("products",JSON.stringify(fetchProducts))
+                    }
+                }
+
+                else
+                {
+                    product.inCart = 1
+                    products[index] = product
+                    window.localStorage.setItem("products",JSON.stringify(products))
+                }
+
+                // console.log(fetchProduct.inCart)
+
+
+            }
+
+            function onLoadCartValue(){
+                let productNum = localStorage.getItem('cartValue')
+
+                if(productNum)
+                {
+                    cartVal.innerText = parseInt(productNum)
+                }
+                else
+                {
+                    cartVal.innerText = 0
+                }
+            }
+
+            onLoadCartValue();
+
+
+        </script>
+    </body>
+</html>
